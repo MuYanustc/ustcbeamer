@@ -21,12 +21,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\title[底部简明标题]{
-    开放量子体系理论
+\title[加倍空间下的核心集]{
+  毕业论文答辩————加倍空间下的核心集
 }
-\author[底部演讲者]{报告人：XXX}
+\author[沈俊杰]{答辩人：沈俊杰}
 \institute[USTC]{
-中国科学技术大学，近代物理系
+中国科学技术大学，计算机科学与技术系
 }
 \date{\today}
 \begin{document}
@@ -59,7 +59,7 @@
 \setbeamertemplate{footline}[footlineon]%添加页脚
 }
 %--------------------
-%子节目录页
+%子节目录页 maybe delete this part
 %--------------------
 \AtBeginSubsection[]{
 \setbeamertemplate{footline}[footlineoff]%取消页脚
@@ -71,48 +71,64 @@
 \setbeamertemplate{footline}[footlineon]%添加页脚
 }
 
+\section{论文简介}
+\begin{frame}
+  \frametitle{论文简介}
+  本论文使用了一种动态更新的算法框架，为满足特定条件的一类CnB机器学习问题构建鲁棒核心集（coreset），并
+  在理论上证明了该核心集大小的复杂度下界与参数空间$\mathcal{P}$的加倍维度有关，在现实数据集上进行鲁棒性相关的实验测试。  
+\end{frame}
+
+
 \section{研究背景}
 \begin{frame}
   \frametitle{研究背景}
-  研究背景：
-  \begin{itemize}
-    \item 一
-    \item 二
-    \item 三
-  \end{itemize}
+在处理一个机器学习任务时，此时我们希望构建一个小的数据集，例如核心集，用以表征原始数据集的一些特性。
+核心集是一种有良好理论保证的数据压缩方法，一个$\varepsilon$-coreset$C$指：
+\begin{equation*}
+  \forall \theta \in \mathcal{P},(1-\varepsilon)f(\theta,X)\leq f(\theta,C)    \leq(1+\varepsilon)f(\theta,X)
+\end{equation*}
+其中$f$和$\theta$是机器学习问题中的损失函数和参数，$\mathcal{P}$是参数空间，$X$是原始数据集。
 
+在大数据时代，随着数据量的增大，我们对核心集的相关算法有了更多的要求，例如：
+\begin{itemize}
+  \item 核心集的大小复杂度
+  \item 核心集的动态维护
+  \item 核心集的鲁棒性
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{鲁棒性}
+  鲁棒性是指核心集在面对数据集中的异常点时，仍然能够保持较好的质量。
+
+  为什么需要鲁棒性？Sampling-based方法在面对异常点时，可能会导致核心集的质量下降。
+  \pause
+  一个$(\beta,\varepsilon)$-coreset$C$指：
+  \begin{equation*}
+    \forall \theta \in \mathcal{P},(1-\varepsilon)f_{(1+\beta)z}(\theta,X)\leq f_z(\theta,C)    \leq(1+\varepsilon)f_{(1-\beta)z}(\theta,X)
+  \end{equation*}
 \end{frame}
 
 
-\section{理论模型}
-\subsection{模型1}
+\section{模型框架}
+\subsection{基础算法}
 \begin{frame}
-  \frametitle{理论模型1}
-  考虑开放系统主方程
-  \begin{equation*}
-    \frac{d\rho}{d t}=-i \left[H,\rho\right]+\kappa\left(2a\rho a^{\dagger}-a^{\dagger}a\rho-\rho a^{\dagger}a\right)
-  \end{equation*}
-  \pause
-  由此得到……
-
-\end{frame}
-\subsection{模型2}
-\begin{frame}
-  \frametitle{理论模型2}
-  近似条件
-  \begin{equation*}
-    \rho\left(t\right)\approx\rho_{\rm S}\left(t\right)\otimes\rho_{\rm B}
-  \end{equation*}
-  \pause
-  于是……
-  \begin{equation*}
-    \frac{d\rho}{d t}=\cdots
-  \end{equation*}
+  \frametitle{基础算法}
+  CnB问题：$f(\theta,x)$关于$\theta$是Lipchitz连续的，且参数$\theta$被限定在一个有界的空间内，不妨为$\mathbb{B}(\tilde{\theta},\ell)$，求$\min_\theta \sum_if(\theta,x_i)$
   
+  \textbf{算法框架（简）：} 对每个点x，利用$f(\theta,x_z)$的值将其分为两类：$x_{si}$和$x_{so}$，即可疑的正常点和异常点。
+  对$x_{si}$中的点，我们运行一个黑盒的已有核心集算法；对$x_{so}$中的点，我们均匀采样，合并两部分，作为输出的核心集。
+\end{frame}
+\subsection{动态情况}
+\begin{frame}
+  \frametitle{动态情况}
+ 
 \end{frame}
 
 
-\section{研究方法}
+\section{实验结果}
+
+\section{理论证明}
 
 \begin{frame}
   \frametitle{研究方法}
