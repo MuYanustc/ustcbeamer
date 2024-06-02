@@ -1,5 +1,6 @@
 %!TEX program = xelatex
 \documentclass[aspectratio=169]{ctexbeamer}
+\usepackage[list=true]{subcaption}
 % \usepackage{physics}  
                         %%% 宽高比说明 %%%%
 %% ctexbeamer宏包支持各种宽高比，但本模板只适配了4:3（默认）和16:9的宽高比背景。
@@ -103,6 +104,7 @@
 
   为什么需要鲁棒性？Sampling-based方法在面对异常点时，可能会导致核心集的质量下降。
   \pause
+  
   一个$(\beta,\varepsilon)$-coreset$C$指：
   \begin{equation*}
     \forall \theta \in \mathcal{P},(1-\varepsilon)f_{(1+\beta)z}(\theta,X)\leq f_z(\theta,C)    \leq(1+\varepsilon)f_{(1-\beta)z}(\theta,X)
@@ -116,17 +118,89 @@
   \frametitle{基础算法}
   CnB问题：$f(\theta,x)$关于$\theta$是Lipchitz连续的，且参数$\theta$被限定在一个有界的空间内，不妨为$\mathbb{B}(\tilde{\theta},\ell)$，求$\min_\theta \sum_if(\theta,x_i)$
   
-  \textbf{算法框架（简）：} 对每个点x，利用$f(\theta,x_z)$的值将其分为两类：$x_{si}$和$x_{so}$，即可疑的正常点和异常点。
-  对$x_{si}$中的点，我们运行一个黑盒的已有核心集算法；对$x_{so}$中的点，我们均匀采样，合并两部分，作为输出的核心集。
+  \textbf{算法框架（简）：} 对每个点x，利用$f(\theta,x_{\tilde{z}})$的值将其分为两类：$X_{si}$和$X_{so}$，即可疑的正常点和异常点。
+  对$X_{si}$中的点，我们运行一个黑盒的已有核心集算法；对$X_{so}$中的点，我们均匀采样，合并两部分，作为输出的核心集。
 \end{frame}
+
 \subsection{动态情况}
 \begin{frame}
   \frametitle{动态情况}
- 
+  \begin{figure}
+    \centering
+    \subcaptionbox[Short Subcaption]{%
+        Merge-and-Reduce（无离群点时）%
+        \label{subfig:sublabel1}%
+    }
+    [%
+        0.45\textwidth % width of caption
+    ]%
+    {%
+        \includegraphics[width=0.45\textwidth]%
+        {./figures/merge-and-reduce.pdf}%
+    }%
+    \hfill
+    \subcaptionbox[Short Subcaption]{%
+        Merge-and-Reduce（有离群点时）%
+        \label{subfig:sublabel2}%
+    }
+    [%
+        0.45\textwidth % width of caption
+    ]%
+    {%
+        \includegraphics[width=0.45\textwidth]%
+        {./figures/merge-and-reduce-outliers.pdf}%
+    }%
+    \caption[Short Caption]{动态情况下的核心集框架}
+    \label{fig:dyn}
+  \end{figure}
+  动态情况指核心集算法需要在数据流中动态地维护核心集，以适应数据的变化。
+
 \end{frame}
 
 
 \section{实验结果}
+\begin{frame}
+  \frametitle{衡量指标}
+  在本实验中，我们使用两种损失偏差，即考虑离群点和不考虑离群点的损失偏差，分别记为$\mathbf{LR}_z$和
+$\mathbf{LR}$，下标z表示核心集构建过程（以及kmeans算法）中选择的离群点的数量（权重和）。
+\begin{equation*}
+    \mathbf{LR} = \max\left\{\frac{f(\theta^*_C,C)}{f(\theta^*_X,X)},\frac{f(\theta^*_X,X)}{f(\theta^*_C,C)}\right\},\quad
+    \mathbf{LR}_z = \max\left\{\frac{f_z(\theta^*_C,C)}{f_z(\theta^*_X,X)},\frac{f_z(\theta^*_X,X)}{f_z(\theta^*_C,C)}\right\}
+\end{equation*}
+其中$\theta^*_{X(C)}$是算法在$X(C)$上使用k-means算法得到的解，核心集大小和加速比分别记为$|C|$和$\mathbf{SR}$。
+本实验中有一对重要参数(noise\_ratio,outliers\_ratio)。noise\_ratio表示我们在数据集中额外生成噪声的比例，
+outlier\_ratio表示我们在构建核心集和运行kmeans算法时使用的参数，和分析中的离群点数量z直接相关。
+实验表明，对于不同的参数对，评价指标$\mathbf{LR}_z$相较$\mathbf{LR}$而言有较大的波动，这说明该评价指标一定程度衡量了鲁棒性，也意味着我们需要针对数据集和算法选择更合适的参数。
+下图展示了在MNIST数据集上不同参数的的实验结果。
+\end{frame}
+
+\begin{frame}{实验结果}
+
+\begin{figure}
+  
+  \centering
+    \begin{minipage}{0.8\linewidth}
+        \centering
+        \includegraphics[width=0.5\linewidth]{./figures/legend.pdf}
+        \subcaption{图（b）、（d）的图例}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.49\linewidth}
+        \centering
+        \includegraphics[width=0.85\linewidth]{./figures/loss_ratio(0.05,0.2) - MNIST.pdf}
+        \subcaption{(0.05,0.2)-MNIST $\mathbf{LR},\mathbf{LR}_z$}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.49\linewidth}
+        \centering
+        \includegraphics[width=0.85\linewidth]{./figures/loss_ratio(0.2,0.05) - MNIST.pdf}
+        \subcaption{(0.2,0.05)-MNIST $\mathbf{LR},\mathbf{LR}_z$}
+    \end{minipage}
+    %\caption{两种参数下MNIST数据集上的表现}
+    \label{fig:mnist_combined}
+\end{figure}
+\end{frame}
+
 
 \section{理论证明}
 
